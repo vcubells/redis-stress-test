@@ -2,15 +2,15 @@
 
 Este programa permite realizar pruebas de estrés a un servidor de Redis mediante la inserción de registros utilizando conexiones concurrentes con la librería Pthreads o con OpenMP.
 
-## Prerequisitos
+## Pre-requisitos
 
 * Un servidor de Redis.
 * El compilador `gcc`
 * La biblioteca de funciones [`hiredis`](https://github.com/redis/hiredis)
 
-## Instucciones de uso
+## Instrucciones de uso
 
-1. Decargue el repositorio a una carpeta de su computadora utilizando el comando `git clone`.
+1. Descargue el repositorio a una carpeta de su computadora utilizando el comando `git clone`.
 2. Cámbiese a la carpeta del proyecto.
 3. Compile el código con el comando:
 
