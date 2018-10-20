@@ -12,7 +12,7 @@
  
  */
 
-/* ./test-redis-c [HOSTNAME | IP] [PORT] */
+/* ./test-redis-c [HOSTNAME | IP] [PORT] [AUTH] */
 
 
 
@@ -26,10 +26,11 @@
 #include <pthread.h>
 
 #define N_THREADS 8
-#define N_INSERT 10000000
+#define N_INSERT 1000000
 
 const char *hostname;
 int port;
+const char *auth;
 
 static void * worker (void *data) {
     
@@ -57,15 +58,29 @@ static void * worker (void *data) {
         pthread_exit(NULL);
     }
     
+    /* Auth */
+    
+    if (auth != "") {
+        reply= redisCommand(c, "AUTH %s", auth);
+        if (reply->type == REDIS_REPLY_ERROR) {
+            /* Authentication failed */
+            printf("ERROR: Auth...\n");
+        }
+        freeReplyObject(reply);
+    }
+    
     /* Set a key */
     
     int inicio = tid * N_INSERT;
     int fin = (tid + 1) * N_INSERT;
     
     for (j = inicio; j < fin; ++j) {
-        number = rand() % 1000000 + 1;
-        
+        number = rand() % 1000000 + 1;        
         reply = redisCommand(c,"SET %d %ld", j, number);
+        if (reply->type == REDIS_REPLY_ERROR) {
+            /* SET failed */
+            printf("ERROR: SET %d %ld...\n", j, number);
+        }
         freeReplyObject(reply);
     }
     
@@ -88,6 +103,8 @@ int main(int argc, const char * argv[]) {
     
     port = (argc > 2) ? atoi(argv[2]) : 6379;
     
+    auth = (argc > 3) ? argv[3] : "";
+
     for (i = 0; i < N_THREADS; i++) {
         pthread_create (&threads[i], NULL, worker,  i);
     }
